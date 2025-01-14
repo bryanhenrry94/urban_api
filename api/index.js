@@ -1,4 +1,13 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
+// Cargar el archivo .env según el entorno
+const ENV = process.env.ENV || 'development';
+dotenv.config({ path: `.env.${ENV}` });
+
+if (!process.env.MONGO_URI) {
+    console.error('Error: MONGO_URI no está definido en las variables de entorno');
+    process.exit(1);
+}
+
 const express = require('express');
 const mongoose = require('../config/db');
 const cors = require('cors');
