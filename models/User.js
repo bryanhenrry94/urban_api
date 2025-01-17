@@ -5,10 +5,12 @@ const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['Admin', 'Accountant', 'User'], default: 'User' },
-  status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' },
+  role: { type: String, enum: ['owner', 'admin', 'user', 'guard'], default: 'user' },
+  status: { type: String, enum: ['active', 'inactive'], default: 'active' },
   companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
+  personId: { type: mongoose.Schema.Types.ObjectId, ref: 'Person', required: true },
   createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
 // Hash password before saving

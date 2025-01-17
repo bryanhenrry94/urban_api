@@ -7,8 +7,17 @@ const CompanySchema = new mongoose.Schema({
   phone: { type: String },
   email: { type: String, required: true },
   logo: { type: String }, // Ruta o URL para el logo de la empresa
-  apiKey: { type: String, unique: true, required: true }, // Clave para autenticación de terceros
-  createdAt: { type: Date, default: Date.now }
+  settings: {
+    commonAreas: [{ type: String }],
+    currency: { type: String, default: 'USD' },
+    timezone: { type: String },
+    notificationPreferences: {
+      email: [{ type: Boolean, default: true }],
+      inApp: { type: Boolean, default: true },
+    },
+  },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model('Company', CompanySchema);

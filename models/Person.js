@@ -2,20 +2,15 @@ const mongoose = require('mongoose');
 
 const PersonSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  idType: { type: String, enum: ['cedula', 'ruc'], required: true }, // Tipo de identificación
-  idNumber: { type: String, required: true }, // Cédula o RUC
-  email: { type: String, unique: true },
+  email: { type: String, validate: { validator: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), message: props => `${props.value} is not a valid email!` } },
+  idType: { type: String, enum: ['cedula', 'ruc', "passport"], required: true }, // Tipo de identificación
+  idNumber: { type: String, required: true },
   phone: { type: String },
   address: { type: String },
-  roles: [{
-    type: String,
-    enum: ['customer', 'supplier', 'employee'],
-    required: true
-  }],
+  roles: [{ type: String, enum: ['owner', 'resident', 'visitor'], required: true }],
   companyName: { type: String },  // Solo si es cliente o proveedor
-  logo: { type: String },  // URL o ruta del logo si es relevante
-  companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
-  createdAt: { type: Date, default: Date.now }, // Fecha de creación del registro
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Person', PersonSchema);

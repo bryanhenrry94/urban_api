@@ -15,15 +15,14 @@ const morgan = require("morgan");
 
 // Routes
 const authRoutes = require('../routes/authRoutes');
-const userRoutes = require('../routes/userRoutes');
 const companyRoutes = require('../routes/companyRoutes');
+const invoiceRoutes = require('../routes/invoiceRoutes');
+const notificationRoutes = require('../routes/notificationRoutes');
+const paymentRoutes = require('../routes/paymentRoutes');
 const personRoutes = require('../routes/personRoutes');
 const productRoutes = require('../routes/productRoutes');
-const invoiceRoutes = require('../routes/invoiceRoutes');
-
-const itemRoutes = require('../routes/itemRoutes');
-const houseRoutes = require('../routes/houseRoutes');
-const tenantRoutes = require('../routes/tenantRoutes');
+const propertyRoutes = require('../routes/propertyRoutes');
+const userRoutes = require('../routes/userRoutes');
 
 const app = express();
 
@@ -37,15 +36,14 @@ app.get('/', function (req, res) {
     res.send({ message: 'Welcome to Urban API' });
 })
 app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/companies', companyRoutes);
+app.use('/api/v1/invoices', invoiceRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/people', personRoutes)
 app.use('/api/v1/products', productRoutes);
-app.use('/api/v1/invoices', invoiceRoutes);
-
-app.use('/api/items', itemRoutes);
-app.use('/api/houses', houseRoutes);
-app.use('/api/tenants', tenantRoutes);
+app.use('/api/v1/properties', propertyRoutes);
+app.use('/api/v1/users', userRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
