@@ -8,13 +8,11 @@ function generateApiKey() {
 
 const createCompany = async (req, res) => {
     try {
-        const { body } = req;
-
+        const { body, tenantId } = req;
         // generate API key
         body.apiKey = generateApiKey();
-
-        console.log('Data Body:', body);
-
+        // Asigna Tenant
+        body.tenantId = tenantId;
         // create company
         const company = new Company(body);
         await company.save();
@@ -28,8 +26,9 @@ const createCompany = async (req, res) => {
 const getCompany = async (req, res) => {
     try {
         const { _id } = req.params;
+        const { tenantId } = req;
 
-        const company = await Company.findById({ _id });
+        const company = await Company.findOne({ _id, tenantId });
         res.status(201).json({ status: 'ok', message: 'Company found successfully', data: company });
     } catch (err) {
         res.status(400).json({ status: 'error', message: `Error finding company: ${err.message}`, data: null });
@@ -38,7 +37,9 @@ const getCompany = async (req, res) => {
 
 const getCompanies = async (req, res) => {
     try {
-        const companies = await Company.find();
+        const { tenantId } = req;
+
+        const companies = await Company.find({ tenantId });
         res.status(201).json({ status: 'ok', message: 'Companies found successfully', data: companies });
     } catch (err) {
         res.status(400).json({ status: 'error', message: `Error finding companies: ${err.message}`, data: null });
@@ -48,9 +49,9 @@ const getCompanies = async (req, res) => {
 const updateCompany = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { body } = req;
+        const { body, tenantId } = req;
 
-        const company = await Company.findByIdAndUpdate(_id, body, { new: true });
+        const company = await Company.findByIdAndUpdate({ _id, tenantId }, body, { new: true });
 
         res.status(200).json({ status: 'ok', message: 'Company updated successfully', data: company });
     } catch (err) {
@@ -61,8 +62,9 @@ const updateCompany = async (req, res) => {
 const deleteCompany = async (req, res) => {
     try {
         const { _id } = req.params;
+        const { tenantId } = req;
 
-        await Company.findByIdAndDelete(_id);
+        await Company.findByIdAndDelete({ _id, tenantId });
 
         res.status(200).json({ status: 'ok', message: 'Company deleted successfully', data: null });
     } catch (err) {

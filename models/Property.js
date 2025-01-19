@@ -1,20 +1,11 @@
 const mongoose = require('mongoose');
 
 const PropertySchema = new mongoose.Schema({
-    companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
-    name: { type: String, required: true },
-    address: { type: String, required: true },
-    owner: {
-        personId: { type: mongoose.Schema.Types.ObjectId, ref: 'Person', required: true },
-        name: { type: String, required: true },
-        email: { type: String, required: true },
-    },
-    residents: [{
-        personId: { type: mongoose.Schema.Types.ObjectId, ref: 'Person', required: true },
-        name: { type: String, required: true },
-        email: { type: String, required: true },
-    }],
-    type: { type: String, enum: ['owned', 'rented'], required: true, default: 'owned' },
+    urbanizationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Urbanization', required: true },
+    unitType: { type: String, enum: ['house', 'apartment', 'studio', 'duplex', 'townhouse', 'penthouse', 'villa', 'flat'], default: 'house', required: true },
+    unitNumber: { type: String, required: true },
+    residents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Resident' }],
+    tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 }, { timestamps: true });

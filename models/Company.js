@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const CompanySchema = new mongoose.Schema({
   name: { type: String, required: true },
-  ruc: { type: String, required: true, unique: true }, // Registro Único de Contribuyentes
+  identification: { type: String, unique: true }, // Registro Único de Contribuyentes
   address: { type: String },
   phone: { type: String },
-  email: { type: String, required: true },
+  email: { type: String },
   logo: { type: String }, // Ruta o URL para el logo de la empresa
   settings: {
     commonAreas: [{ type: String }],
@@ -16,7 +16,7 @@ const CompanySchema = new mongoose.Schema({
       inApp: { type: Boolean, default: true },
     },
   },
-  createdAt: { type: Date, default: Date.now },
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
   updatedAt: { type: Date, default: Date.now },
 });
 

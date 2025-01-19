@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const Company = require('../models/Company');
+const Tenant = require('../models/Tenant');
 const Person = require('../models/Person');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -21,7 +21,9 @@ const signin = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      companyId: user.companyId,
+      tenantId: user.tenantId,
+      companies: user.companies,
+      companySelected: user.companySelected,
     };
 
     res.json({ status: "ok", message: 'Login successful', data: { user: userData, token } });
@@ -32,50 +34,34 @@ const signin = async (req, res) => {
 
 const signup = async (req, res) => {
   try {
-    const { company, admin } = req.body;
+    const { name, email, password } = req.body;
 
     // Validar que los campos requeridos estén presentes
-    if (!company || !admin) {
-      return res.status(400).json({ status: 'error', message: 'Company and admin data are required', data: null });
+    if (!name) {
+      return res.status(400).json({ status: 'error', message: 'Campos name es requerido', data: null });
     }
-
-    // Validar si el RUC ya existe
-    const existingCompany = await Company.findOne({ ruc: company.ruc });
-    if (existingCompany) {
-      return res.status(400).json({ status: 'error', message: 'Company RUC already exists', data: null });
+    if (!email) {
+      return res.status(400).json({ status: 'error', message: 'Campos email es requerido', data: null });
+    }
+    if (!password) {
+      return res.status(400).json({ status: 'error', message: 'Campos password es requerido', data: null });
     }
 
     // Validar si el correo del administrador ya existe
-    const existingUser = await User.findOne({ email: admin.email });
+    const existingUser = await User.findOne({ email: email });
     if (existingUser) {
-      return res.status(400).json({ status: 'error', message: 'Admin email already exists', data: null });
+      return res.status(400).json({ status: 'error', message: 'Correo electronico ya esta registrado', data: null });
     }
 
-    // Crear la empresa
-    const newCompany = await Company.create({
-      name: company.name,
-      ruc: company.ruc,
-      address: company.address,
-      phone: company.phone,
-    });
-
-    // Crear la persona asociada al administrador
-    const newPerson = await Person.create({
-      companyId: newCompany._id,
-      name: admin.name,
-      email: admin.email,
-      idType: admin.idType,
-      idNumber: admin.idNumber,
-      phone: admin.phone,
-      roles: admin.roles,
-    });
+    // Crear Tenant
+    const newTenant = await Tenant.create({ name: name });
 
     // Crear el usuario asociado al administrador
     const newUser = await User.create({
-      personId: newPerson._id,
-      companyId: newCompany._id,
-      email: admin.password,
-      password: hashedPassword,
+      name: name,
+      email: email,
+      password: password,
+      tenantId: newTenant._id,
     });
 
     // Respuesta exitosa
@@ -86,12 +72,9 @@ const signup = async (req, res) => {
         user: {
           id: newUser._id,
           email: newUser.email,
-          roles: admin.roles,
+          role: newUser.role,
         },
-        company: {
-          id: newCompany._id,
-          name: newCompany.name,
-        },
+        company: [],
       },
     });
   } catch (err) {

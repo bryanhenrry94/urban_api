@@ -1,13 +1,15 @@
 const Tenant = require("../models/Tenant");
 
 const tenantMiddleware = async (req, res, next) => {
-    const tenantDomain = req.headers["x-tenant-domain"]; // O extraído del subdominio
-    if (!tenantDomain) {
+    const tenantId = req.headers["x-tenant-id"]; // O extraído del subdominio
+    // const tenantId = req.user.tenantId; // O extraído del subdominio
+
+    if (!tenantId) {
         return res.status(400).json({ error: "Tenant domain is required" });
     }
 
     try {
-        const tenant = await Tenant.findOne({ domain: tenantDomain });
+        const tenant = await Tenant.findById(tenantId);
         if (!tenant) {
             return res.status(404).json({ error: "Tenant not found" });
         }

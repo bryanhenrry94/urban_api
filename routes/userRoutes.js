@@ -2,14 +2,17 @@ const express = require('express');
 const { createUser, getUsers, getUser, getUserByEmail, updateUser, updateProfile, changePassword, deleteUser, resetPassword } = require('../controllers/userController');
 const router = express.Router();
 
-router.post('/', createUser);
-router.get('/', getUsers)
-router.get('/:_id', getUser);
+const { verifyToken } = require('../middlewares/authMiddleware');
+const { tenantMiddleware } = require('../middlewares/tenantMiddleware');
+
+router.get('/', [verifyToken, tenantMiddleware], getUsers)
+router.get('/:_id', [verifyToken, tenantMiddleware], getUser);
+router.post('/', [verifyToken, tenantMiddleware], createUser);
+router.put('/:_id', [verifyToken, tenantMiddleware], updateUser);
+router.put('/profile/:_id', [verifyToken, tenantMiddleware], updateProfile);
+router.put('/change-password/:_id', [verifyToken, tenantMiddleware], changePassword);
 router.get('/email/:email', getUserByEmail);
-router.put('/:_id', updateUser);
-router.put('/profile/:_id', updateProfile);
-router.put('/change-password/:_id', changePassword);
 router.post('/reset-password', resetPassword);
-router.delete('/:_id', deleteUser);
+router.delete('/:_id', [verifyToken, tenantMiddleware], deleteUser);
 
 module.exports = router;

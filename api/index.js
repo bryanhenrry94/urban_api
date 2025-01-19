@@ -23,6 +23,8 @@ const personRoutes = require('../routes/personRoutes');
 const productRoutes = require('../routes/productRoutes');
 const propertyRoutes = require('../routes/propertyRoutes');
 const userRoutes = require('../routes/userRoutes');
+const urbanizationRoutes = require('../routes/urbanizationRoutes');
+const residentRoutes = require('../routes/residentRoutes');
 
 const app = express();
 
@@ -40,10 +42,12 @@ app.use('/api/v1/companies', companyRoutes);
 app.use('/api/v1/invoices', invoiceRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/payments', paymentRoutes);
-app.use('/api/v1/people', personRoutes)
+app.use('/api/v1/persons', personRoutes)
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/properties', propertyRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/urbanizations', urbanizationRoutes);
+app.use('/api/v1/residents', residentRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
