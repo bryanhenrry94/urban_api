@@ -23,7 +23,7 @@ const getUsers = async (req, res) => {
     try {
         const { tenantId } = req;
 
-        const users = await User.find({ tenantId }).populate({ path: 'urbanizationId', as: 'Urbanization' });
+        const users = await User.find({ tenantId }).populate({ path: 'propertyId', as: 'Property' });
         res.status(200).json({ status: 'ok', message: 'Users found successfully', data: users });
     } catch (err) {
         res.status(400).json({ status: 'error', message: `Error find user: ${err.message}`, data: null });
