@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
   status: { type: String, enum: ['active', 'inactive'], default: 'active' },
   propertyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Property', default: null },
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
+  codeOTP: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

@@ -128,21 +128,50 @@ const resetPassword = async (req, res) => {
         }
 
         // generate random password
-        const password = Math.random().toString(36).slice(-8);
+        const codeOTP = Math.floor(100000 + Math.random() * 900000).toString();
 
-        user.password = password;
+        user.codeOTP = codeOTP;
         await user.save();
 
         await sendEmail(
             user.email,
             'Restablecimiento de contraseña',
-            `Su nueva contraseña es: ${password}`
+            `Tu código para restablecer la contraseña es: ${codeOTP}`
         );
 
-        res.status(200).json({ status: 'ok', message: 'Contraseña restablecida con éxito', data: null });
+        res.status(200).json({ status: 'ok', message: 'Codigo OTP generado con éxito!', data: null });
     }
     catch (error) {
         res.status(400).json({ status: 'error', message: `Error restableciendo la contraseña: ${error.message}`, data: null });
+    }
+}
+
+const validateCodeOTP = async (req, res) => {
+    try {
+        const { email, codeOTP } = req.body;
+
+        if (!email) {
+            throw new Error('Email incorrecto');
+        }
+
+        if (!codeOTP) {
+            throw new Error('Código OTP incorrecto');
+        }
+
+        // find user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new Error('Email incorrecto');
+        }
+
+        if (user.codeOTP != codeOTP) {
+            return res.status(200).json({ status: 'ok', message: 'Codigo OTP invalido', data: false });
+        }
+
+        return res.status(200).json({ status: 'ok', message: 'Codigo OTP validado con éxito!', data: true });
+    }
+    catch (error) {
+        return res.status(400).json({ status: 'error', message: `Codigo OTP inválido: ${error.message}`, data: false });
     }
 }
 
@@ -157,4 +186,25 @@ const getUserByEmail = async (req, res) => {
     }
 };
 
-module.exports = { createUser, getUsers, getUser, getUserByEmail, updateUser, updateProfile, changePassword, deleteUser, resetPassword };
+const updatePassword = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            throw new Error("Email incorrecto");
+        }
+
+        // updating password
+        user.password = password;
+        await user.save();
+
+        res.status(201).json({ status: 'ok', message: 'Password change successfully', data: true });
+    }
+    catch (err) {
+        res.status(400).json({ status: 'error', message: `Error updating password: ${err.message}`, data: null });
+    }
+}
+
+module.exports = { createUser, getUsers, getUser, getUserByEmail, updateUser, updateProfile, changePassword, deleteUser, resetPassword, validateCodeOTP, updatePassword };
