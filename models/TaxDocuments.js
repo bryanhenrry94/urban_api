@@ -9,7 +9,7 @@ const TaxDocumentSchema = new mongoose.Schema({
     xmlFile: { type: String, required: true },
     pdfFile: { type: String, required: true },
     status: { type: String, required: true, enum: ['draf', 'emit', 'rejected'] },
-    tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });

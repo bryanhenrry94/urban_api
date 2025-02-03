@@ -9,7 +9,7 @@ const PersonSchema = new mongoose.Schema({
   roles: [{ type: String, enum: ['owner', 'resident', 'visitor'], required: true }],
   country: { type: String },
   companyName: { type: String },  // Solo si es cliente o proveedor
-  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
+  tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

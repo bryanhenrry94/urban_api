@@ -11,7 +11,7 @@ const AccessRequestSchema = new mongoose.Schema({
     status: { type: String, enum: ["pending", "accepted", "denied"], default: "pending" },
     entryTime: { type: Date },
     exitTime: { type: Date },
-    tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });

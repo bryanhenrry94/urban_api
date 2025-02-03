@@ -3,9 +3,9 @@ const crypto = require('crypto');
 
 const createUrbanization = async (req, res) => {
     try {
-        const { body, tenantId } = req;
+        const { body, tenant } = req;
         // Asigna Tenant
-        body.tenantId = tenantId;
+        body.tenant = tenant;
         // create urbanization
         const urbanization = new Urbanization(body);
         await urbanization.save();
@@ -19,9 +19,9 @@ const createUrbanization = async (req, res) => {
 const getUrbanization = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        const urbanization = await Urbanization.findOne({ _id, tenantId });
+        const urbanization = await Urbanization.findOne({ _id, tenant });
         res.status(201).json({ status: 'ok', message: 'Urbanization found successfully', data: urbanization });
     } catch (err) {
         res.status(400).json({ status: 'error', message: `Error finding urbanization: ${err.message}`, data: null });
@@ -30,9 +30,9 @@ const getUrbanization = async (req, res) => {
 
 const getUrbanizations = async (req, res) => {
     try {
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        const urbanizations = await Urbanization.find({ tenantId });
+        const urbanizations = await Urbanization.find({ tenant });
         res.status(201).json({ status: 'ok', message: 'Urbanizations found successfully', data: urbanizations });
     } catch (err) {
         res.status(400).json({ status: 'error', message: `Error finding urbanizations: ${err.message}`, data: null });
@@ -42,9 +42,9 @@ const getUrbanizations = async (req, res) => {
 const updateUrbanization = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { body, tenantId } = req;
+        const { body, tenant } = req;
 
-        const urbanization = await Urbanization.findByIdAndUpdate({ _id, tenantId }, body, { new: true });
+        const urbanization = await Urbanization.findByIdAndUpdate({ _id, tenant }, body, { new: true });
 
         res.status(200).json({ status: 'ok', message: 'Urbanization updated successfully', data: urbanization });
     } catch (err) {
@@ -55,9 +55,9 @@ const updateUrbanization = async (req, res) => {
 const deleteUrbanization = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        await Urbanization.findByIdAndDelete({ _id, tenantId });
+        await Urbanization.findByIdAndDelete({ _id, tenant });
 
         res.status(200).json({ status: 'ok', message: 'Urbanization deleted successfully', data: null });
     } catch (err) {

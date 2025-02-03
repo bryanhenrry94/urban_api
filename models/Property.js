@@ -41,7 +41,7 @@ const PropertySchema = new mongoose.Schema({
         email: { type: String },
         phoneNumber: { type: String },
     },
-    tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 }, { timestamps: true });

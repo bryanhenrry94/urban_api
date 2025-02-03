@@ -24,8 +24,9 @@ const signin = async (req, res) => {
       email: user.email,
       role: user.role,
       status: user.status,
-      propertyId: user.propertyId,
-      tenantId: user.tenantId,
+      property: user.property,
+      company: user.company,
+      tenant: user.tenant,
       codeOTP: user.codeOTP,
       onboardingCompleted: user.onboardingCompleted,
     };

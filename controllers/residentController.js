@@ -3,9 +3,9 @@ const crypto = require('crypto');
 
 const createResident = async (req, res) => {
     try {
-        const { body, tenantId } = req;
+        const { body, tenant } = req;
         // Asigna Tenant
-        body.tenantId = tenantId;
+        body.tenant = tenant;
         // create resident
         const resident = new Resident(body);
         await resident.save();
@@ -19,9 +19,9 @@ const createResident = async (req, res) => {
 const getResident = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        const resident = await Resident.findOne({ _id, tenantId });
+        const resident = await Resident.findOne({ _id, tenant });
         res.status(201).json({ status: 'ok', message: 'Resident found successfully', data: resident });
     } catch (err) {
         res.status(400).json({ status: 'error', message: `Error finding resident: ${err.message}`, data: null });
@@ -30,9 +30,9 @@ const getResident = async (req, res) => {
 
 const getResidents = async (req, res) => {
     try {
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        const residents = await Resident.find({ tenantId })
+        const residents = await Resident.find({ tenant })
             .populate({ path: 'urbanizationId', as: 'Urbanization' })
             .populate({ path: 'userId', as: 'Usuario' })
             .populate({ path: 'propertyId', as: 'Property' });
@@ -46,9 +46,9 @@ const getResidents = async (req, res) => {
 const updateResident = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { body, tenantId } = req;
+        const { body, tenant } = req;
 
-        const resident = await Resident.findByIdAndUpdate({ _id, tenantId }, body, { new: true });
+        const resident = await Resident.findByIdAndUpdate({ _id, tenant }, body, { new: true });
 
         res.status(200).json({ status: 'ok', message: 'Resident updated successfully', data: resident });
     } catch (err) {
@@ -59,9 +59,9 @@ const updateResident = async (req, res) => {
 const deleteResident = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        await Resident.findByIdAndDelete({ _id, tenantId });
+        await Resident.findByIdAndDelete({ _id, tenant });
 
         res.status(200).json({ status: 'ok', message: 'Resident deleted successfully', data: null });
     } catch (err) {

@@ -8,7 +8,7 @@ const UrbanizationSchema = new mongoose.Schema({
         frequency: { type: String },
         rate: { type: Number },
     }],
-    tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });

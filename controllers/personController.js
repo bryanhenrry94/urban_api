@@ -3,10 +3,10 @@ const Person = require('../models/Person.js');
 const createPerson = async (req, res) => {
     try {
         const { body } = req;
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        // Add tenantId to the body
-        body.tenantId = tenantId;
+        // Add tenant to the body
+        body.tenant = tenant;
 
         const person = new Person(body);
         await person.save();
@@ -19,9 +19,9 @@ const createPerson = async (req, res) => {
 
 const getPersons = async (req, res) => {
     try {
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        const people = await Person.find({ tenantId });
+        const people = await Person.find({ tenant });
 
         res.status(201).json({ status: 'ok', message: 'People found successfully', data: people });
     } catch (err) {
@@ -43,9 +43,9 @@ const getPerson = async (req, res) => {
 const updatePerson = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { body, tenantId } = req;
+        const { body, tenant } = req;
 
-        const person = await Person.findByIdAndUpdate({ _id, tenantId }, body, { new: true });
+        const person = await Person.findByIdAndUpdate({ _id, tenant }, body, { new: true });
 
         res.status(200).json({ status: 'ok', message: 'Person updated successfully', data: person });
     } catch (err) {
@@ -56,9 +56,9 @@ const updatePerson = async (req, res) => {
 const deletePerson = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        await Person.findByIdAndDelete({ _id, tenantId });
+        await Person.findByIdAndDelete({ _id, tenant });
 
         res.status(200).json({ status: 'ok', message: 'Person deleted successfully', data: null });
     } catch (err) {

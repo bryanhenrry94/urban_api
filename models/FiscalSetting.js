@@ -13,7 +13,7 @@ const FiscalSettingSchema = new mongoose.Schema({
         certificatePassword: { type: String },
         certificateExpiration: { type: Date },
     },
-    tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });

@@ -4,10 +4,10 @@ const sendEmail = require('../utils/email');
 
 const createUser = async (req, res) => {
     try {
-        const { body, tenantId } = req;
+        const { body, tenant } = req;
 
         // create user
-        body.tenantId = tenantId;
+        body.tenant = tenant;
         body.password = Math.random().toString(36).slice(-8);
 
         const user = new User(body);
@@ -21,9 +21,11 @@ const createUser = async (req, res) => {
 
 const getUsers = async (req, res) => {
     try {
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        const users = await User.find({ tenantId }).populate({ path: 'propertyId', as: 'Property' });
+        console.log("tenant: ", tenant);
+
+        const users = await User.find({ tenant }).populate({ path: 'property', as: 'Property' });
         res.status(200).json({ status: 'ok', message: 'Users found successfully', data: users });
     } catch (err) {
         res.status(400).json({ status: 'error', message: `Error find user: ${err.message}`, data: null });
@@ -33,9 +35,9 @@ const getUsers = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        const user = await User.findById({ _id, tenantId });
+        const user = await User.findById({ _id, tenant });
         res.status(201).json({ status: 'ok', message: 'User find successfully', data: user });
     } catch (err) {
         res.status(400).json({ status: 'error', message: `Error find user: ${err.message}`, data: null });
@@ -45,9 +47,9 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { body, tenantId } = req;
+        const { body, tenant } = req;
 
-        const user = await User.findByIdAndUpdate({ _id, tenantId }, body, { new: true });
+        const user = await User.findByIdAndUpdate({ _id, tenant }, body, { new: true });
         await user.save();
 
         res.status(201).json({ status: 'ok', message: 'Profile update successfully', data: user });
@@ -60,9 +62,9 @@ const updateProfile = async (req, res) => {
     try {
         const { _id } = req.params;
         const { name, email } = req.body;
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        const user = await User.findById({ _id, tenantId });
+        const user = await User.findById({ _id, tenant });
 
         // updating user
         if (name) user.name = name;
@@ -80,9 +82,9 @@ const changePassword = async (req, res) => {
     try {
         const { _id } = req.params;
         const { oldPassword, newPassword } = req.body;
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        const user = await User.findById({ _id, tenantId });
+        const user = await User.findById({ _id, tenant });
 
         if (user && !(await bcrypt.compare(oldPassword, user.password))) {
             return res.status(400).json({ message: 'La contraseña ingresada es incorrecta' });
@@ -103,9 +105,9 @@ const changePassword = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const { _id } = req.params;
-        const { tenantId } = req;
+        const { tenant } = req;
 
-        await User.findByIdAndDelete({ _id, tenantId });
+        await User.findByIdAndDelete({ _id, tenant });
 
         res.status(200).json({ status: 'ok', message: 'User deleted successfully', data: null });
     } catch (err) {
