@@ -142,7 +142,7 @@ const resetPassword = async (req, res) => {
         res.status(200).json({ status: 'ok', message: 'Codigo OTP generado con éxito!', data: null });
     }
     catch (error) {
-        res.status(400).json({ status: 'error', message: `Error restableciendo la contraseña: ${error.message}`, data: null });
+        res.status(400).json({ status: 'error', message: error.message, data: null });
     }
 }
 
@@ -165,13 +165,13 @@ const validateCodeOTP = async (req, res) => {
         }
 
         if (user.codeOTP != codeOTP) {
-            return res.status(200).json({ status: 'ok', message: 'Codigo OTP invalido', data: false });
+            throw new Error('Codigo OTP invalido');
         }
 
         return res.status(200).json({ status: 'ok', message: 'Codigo OTP validado con éxito!', data: true });
     }
     catch (error) {
-        return res.status(400).json({ status: 'error', message: `Codigo OTP inválido: ${error.message}`, data: false });
+        return res.status(400).json({ status: 'error', message: `Error: ${error.message}`, data: false });
     }
 }
 

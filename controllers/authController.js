@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const Tenant = require('../models/Tenant');
 const Person = require('../models/Person');
+const Company = require('../models/Company');
+const Subscription = require('../models/Subscription');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -21,9 +23,11 @@ const signin = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      status: user.status,
+      propertyId: user.propertyId,
       tenantId: user.tenantId,
-      companies: user.companies,
-      companySelected: user.companySelected,
+      codeOTP: user.codeOTP,
+      onboardingCompleted: user.onboardingCompleted,
     };
 
     res.json({ status: "ok", message: 'Login successful', data: { user: userData, token } });
@@ -34,51 +38,152 @@ const signin = async (req, res) => {
 
 const signup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, surname, country, phone, email, password, companyName, identification, address, plan } = req.body;
 
-    // Validar que los campos requeridos estén presentes
-    if (!name) {
-      return res.status(400).json({ status: 'error', message: 'Campos name es requerido', data: null });
-    }
-    if (!email) {
-      return res.status(400).json({ status: 'error', message: 'Campos email es requerido', data: null });
-    }
-    if (!password) {
-      return res.status(400).json({ status: 'error', message: 'Campos password es requerido', data: null });
+    // ✅ Validación de campos obligatorios
+    const requiredFields = { name, email, password, companyName, identification, address, plan };
+    for (const [key, value] of Object.entries(requiredFields)) {
+      if (!value) {
+        return res.status(400).json({
+          status: "error",
+          message: `El campo ${key} es requerido.`,
+          data: null,
+        });
+      }
     }
 
-    // Validar si el correo del administrador ya existe
-    const existingUser = await User.findOne({ email: email });
+    // ✅ Validar plan de suscripción
+    const validPlans = ["essential", "advanced", "enterprise"];
+    if (!validPlans.includes(plan)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Plan de suscripción inválido.",
+        data: null,
+      });
+    }
+
+    // ✅ Validar formato del email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Formato de correo electrónico inválido.",
+        data: null,
+      });
+    }
+
+    // // ✅ Validar formato del teléfono (opcional, pero recomendable)
+    // const phoneRegex = /^\+\d{1,3}\d{7,14}$/;
+    // if (phone && !phoneRegex.test(phone)) {
+    //   return res.status(400).json({
+    //     status: "error",
+    //     message: "Formato de número de teléfono inválido (Ej: +593987654321).",
+    //     data: null,
+    //   });
+    // }
+
+    // ✅ Verificar si el usuario ya está registrado
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ status: 'error', message: 'Correo electronico ya esta registrado', data: null });
+      return res.status(400).json({
+        status: "error",
+        message: "La cuenta de correo ya está registrada.",
+        data: null,
+      });
     }
 
-    // Crear Tenant
-    const newTenant = await Tenant.create({ name: name });
+    const existCompany = await Company.findOne({ identification });
+    if (existCompany) {
+      return res.status(400).json({
+        status: "error",
+        message: "La compañía ya está registrada.",
+        data: null,
+      });
+    }
 
-    // Crear el usuario asociado al administrador
-    const newUser = await User.create({
-      name: name,
-      email: email,
-      password: password,
-      tenantId: newTenant._id,
+    const tenantName = companyName.trim().replace(/\s+/g, "-").toLowerCase();
+    const existTenant = await Tenant.findOne({ name: tenantName });
+    if (existTenant) {
+      return res.status(400).json({
+        status: "error",
+        message: "La compañía ya está registrada.",
+        data: null,
+      });
+    }
+
+    // ✅ PASO 1: Crear Tenant
+    const newTenant = await Tenant.create({ name: tenantName });
+
+    // ✅ PASO 2: Crear la compañía asociada al administrador
+    const newCompany = await Company.create({
+      name: companyName,
+      identification,
+      address,
+      tenant: newTenant._id,
     });
 
-    // Respuesta exitosa
+    // ✅ PASO 3: Crear el usuario asociado al administrador
+    const newUser = await User.create({
+      name: `${name} ${surname}`,
+      email,
+      password,
+      country,
+      phone,
+      tenant: newTenant._id,
+      company: newCompany._id,
+      role: "admin",
+      status: "active",
+    });
+
+    // ✅ PASO 4: Crear la suscripción asociada al usuario
+    let amount = 0;
+    switch (plan) {
+      case "essential":
+        amount = 9.99;
+        break;
+      case "advanced":
+        amount = 19.99;
+        break;
+      case "enterprise":
+        amount = 29.99;
+        break;
+    }
+
+    const newSubscription = await Subscription.create({
+      user: newUser._id,
+      plan,
+      status: "active",
+      amount,
+      currency: "USD",
+    });
+
+    // ✅ PASO 5: Vincular la suscripción al usuario
+    newUser.subscription = newSubscription._id;
+    await newUser.save();
+
+    // ✅ Respuesta exitosa
     res.status(201).json({
-      status: 'ok',
-      message: 'User registered successfully',
+      status: "ok",
+      message: "Cuenta registrada correctamente.",
       data: {
         user: {
           id: newUser._id,
           email: newUser.email,
           role: newUser.role,
         },
-        company: [],
+        company: {
+          id: newCompany._id,
+          name: newCompany.name,
+        },
       },
     });
   } catch (err) {
-    res.status(500).json({ status: 'error', message: `Error during signup: ${err.message}`, data: null });
+    console.error("Error en signup:", err);
+    res.status(500).json({
+      status: "error",
+      message: `Error durante el registro: ${err.message}`,
+      data: null,
+    });
   }
 };
 
