@@ -2,19 +2,24 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
+  tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  country: { type: String },
-  phone: { type: String },
-  role: { type: String, enum: ['owner', 'admin', 'user', 'guard'], default: 'admin' },
+  role: { type: String, enum: ['owner', 'admin', 'resident', 'guard'], default: 'admin' },
   status: { type: String, enum: ['active', 'inactive'], default: 'active' },
-  tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
-  company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' },
   subscription: { type: mongoose.Schema.Types.ObjectId, ref: 'Subscription' },
+  units: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Unit', default: [] }],
+  profile: {
+    name: { type: String },
+    surname: { type: String },
+    country: { type: String },
+    phone: { type: String },
+    avatarUrl: { type: String },
+    documentId: { type: String }, // Número de identificación
+    birthdate: { type: Date },
+  },
   codeOTP: { type: String },
-  onboardingCompleted: { type: Boolean, default: false },
-  property: { type: mongoose.Schema.Types.ObjectId, ref: 'Property', default: null },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

@@ -23,9 +23,8 @@ const getUsers = async (req, res) => {
     try {
         const { tenant } = req;
 
-        console.log("tenant: ", tenant);
-
-        const users = await User.find({ tenant }).populate({ path: 'property', as: 'Property' });
+        // const users = await User.find({ tenant }).populate({ path: 'units', as: 'Units' });
+        const users = await User.find({ tenant });
         res.status(200).json({ status: 'ok', message: 'Users found successfully', data: users });
     } catch (err) {
         res.status(400).json({ status: 'error', message: `Error find user: ${err.message}`, data: null });
@@ -114,6 +113,48 @@ const deleteUser = async (req, res) => {
         res.status(400).json({ status: 'error', message: `Error deleting user: ${err.message}`, data: null });
     }
 };
+
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            throw new Error('Email incorrecto');
+        }
+
+        // find user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new Error('Email incorrecto');
+        }
+
+        // generate random password
+        const generateRandomPassword = (length) => {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(),.?":{}|<>';
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        };
+
+        const password = generateRandomPassword(12);
+
+        user.password = password;
+        await user.save();
+
+        await sendEmail(
+            user.email,
+            'Restablecimiento de contraseña',
+            `Tu contraseña temporal es: ${password}`
+        );
+
+        res.status(200).json({ status: 'ok', message: 'Correo de reseteo de contraseña con éxito!', data: null });
+    }
+    catch (error) {
+        res.status(400).json({ status: 'error', message: error.message, data: null });
+    }
+}
 
 const resetPassword = async (req, res) => {
     try {
@@ -209,4 +250,4 @@ const updatePassword = async (req, res) => {
     }
 }
 
-module.exports = { createUser, getUsers, getUser, getUserByEmail, updateUser, updateProfile, changePassword, deleteUser, resetPassword, validateCodeOTP, updatePassword };
+module.exports = { createUser, getUsers, getUser, getUserByEmail, updateUser, updateProfile, changePassword, deleteUser, forgotPassword, resetPassword, validateCodeOTP, updatePassword };

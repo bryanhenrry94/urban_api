@@ -21,10 +21,14 @@ const notificationRoutes = require('../routes/notificationRoutes');
 const paymentRoutes = require('../routes/paymentRoutes');
 const personRoutes = require('../routes/personRoutes');
 const productRoutes = require('../routes/productRoutes');
-const propertyRoutes = require('../routes/propertyRoutes');
+const unitRoutes = require('../routes/unitRoutes');
 const userRoutes = require('../routes/userRoutes');
 const urbanizationRoutes = require('../routes/urbanizationRoutes');
 const residentRoutes = require('../routes/residentRoutes');
+const journalEntryRoutes = require('../routes/journalEntryRoutes');
+const journalEntryDetailRoutes = require('../routes/journalEntryDetailRoutes');
+const costCenterRoutes = require('../routes/costCenterRoutes');
+const ledgerAccountRoutes = require('../routes/ledgerAccountRoutes');
 
 const app = express();
 
@@ -44,10 +48,15 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/persons', personRoutes)
 app.use('/api/v1/products', productRoutes);
-app.use('/api/v1/properties', propertyRoutes);
+app.use('/api/v1/units', unitRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/urbanizations', urbanizationRoutes);
 app.use('/api/v1/residents', residentRoutes);
+
+app.use('/api/v1/accounting/ledger-accounts', ledgerAccountRoutes);
+app.use('/api/v1/accounting/journal-entries', journalEntryRoutes);
+app.use('/api/v1/accounting/journal-entry-details', journalEntryDetailRoutes);
+app.use('/api/v1/accounting/cost-centers', costCenterRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

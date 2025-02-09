@@ -24,7 +24,7 @@ const signin = async (req, res) => {
       email: user.email,
       role: user.role,
       status: user.status,
-      property: user.property,
+      units: user.units,
       company: user.company,
       tenant: user.tenant,
       codeOTP: user.codeOTP,
@@ -39,10 +39,10 @@ const signin = async (req, res) => {
 
 const signup = async (req, res) => {
   try {
-    const { name, surname, country, phone, email, password, companyName, identification, address, plan } = req.body;
+    const { name, surname, country, phone, email, password, companyName, taxId, address, plan } = req.body;
 
     // ✅ Validación de campos obligatorios
-    const requiredFields = { name, email, password, companyName, identification, address, plan };
+    const requiredFields = { name, email, password, companyName, taxId, address, plan };
     for (const [key, value] of Object.entries(requiredFields)) {
       if (!value) {
         return res.status(400).json({
@@ -93,7 +93,7 @@ const signup = async (req, res) => {
       });
     }
 
-    const existCompany = await Company.findOne({ identification });
+    const existCompany = await Company.findOne({ taxId });
     if (existCompany) {
       return res.status(400).json({
         status: "error",
@@ -118,7 +118,7 @@ const signup = async (req, res) => {
     // ✅ PASO 2: Crear la compañía asociada al administrador
     const newCompany = await Company.create({
       name: companyName,
-      identification,
+      taxId,
       address,
       tenant: newTenant._id,
     });
@@ -128,12 +128,16 @@ const signup = async (req, res) => {
       name: `${name} ${surname}`,
       email,
       password,
-      country,
-      phone,
       tenant: newTenant._id,
       company: newCompany._id,
       role: "admin",
       status: "active",
+      profile: {
+        name,
+        surname,
+        country,
+        phone,
+      }
     });
 
     // ✅ PASO 4: Crear la suscripción asociada al usuario
@@ -171,11 +175,7 @@ const signup = async (req, res) => {
           id: newUser._id,
           email: newUser.email,
           role: newUser.role,
-        },
-        company: {
-          id: newCompany._id,
-          name: newCompany.name,
-        },
+        }
       },
     });
   } catch (err) {
