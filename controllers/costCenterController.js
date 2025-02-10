@@ -1,4 +1,5 @@
 const CostCenter = require('../models/CostCenter.js');
+const JournalEntryDetail = require('../models/JournalEntryDetail.js');
 
 const createCostCenter = async (req, res) => {
     try {
@@ -55,11 +56,17 @@ const deleteCostCenter = async (req, res) => {
         const { _id } = req.params;
         const { tenant } = req;
 
+        // valida que no este asociado a un asiento contable
+        const hasAccountingEntries = await JournalEntryDetail.exists({ cost_center: _id, tenant });
+        if (hasAccountingEntries) {
+            return res.status(400).json({ status: 'error', message: 'Centro de costo tiene movimientos contables', data: false });
+        }
+
         await CostCenter.findByIdAndDelete({ _id, tenant });
 
-        res.status(200).json({ status: 'ok', message: 'Cost Center deleted successfully', data: null });
+        res.status(200).json({ status: 'ok', message: 'Cost Center deleted successfully', data: true });
     } catch (err) {
-        res.status(400).json({ status: 'error', message: `Error deleting cost center: ${err.message}`, data: null });
+        res.status(400).json({ status: 'error', message: `Error deleting cost center: ${err.message}`, data: false });
     }
 }
 

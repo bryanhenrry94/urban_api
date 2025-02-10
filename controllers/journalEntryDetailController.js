@@ -3,8 +3,8 @@ const JournalEntryDetail = require('../models/JournalEntryDetail');
 const createJournalEntryDetail = async (req, res) => {
     try {
         const { body, tenant } = req;
-        // create journal entry detail
         body.tenant = tenant;
+
         const journalEntryDetail = new JournalEntryDetail(body);
         await journalEntryDetail.save();
 

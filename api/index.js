@@ -25,10 +25,12 @@ const unitRoutes = require('../routes/unitRoutes');
 const userRoutes = require('../routes/userRoutes');
 const urbanizationRoutes = require('../routes/urbanizationRoutes');
 const residentRoutes = require('../routes/residentRoutes');
+
 const journalEntryRoutes = require('../routes/journalEntryRoutes');
 const journalEntryDetailRoutes = require('../routes/journalEntryDetailRoutes');
 const costCenterRoutes = require('../routes/costCenterRoutes');
-const ledgerAccountRoutes = require('../routes/ledgerAccountRoutes');
+const chartAccountRoutes = require('../routes/chartAccountRoutes');
+const accountingPeriodRoutes = require('../routes/accountingPeriodRoutes');
 
 const app = express();
 
@@ -53,10 +55,12 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/urbanizations', urbanizationRoutes);
 app.use('/api/v1/residents', residentRoutes);
 
-app.use('/api/v1/accounting/ledger-accounts', ledgerAccountRoutes);
+// contabilidad
+app.use('/api/v1/accounting/chart-accounts', chartAccountRoutes);
 app.use('/api/v1/accounting/journal-entries', journalEntryRoutes);
 app.use('/api/v1/accounting/journal-entry-details', journalEntryDetailRoutes);
 app.use('/api/v1/accounting/cost-centers', costCenterRoutes);
+app.use('/api/v1/accounting/accounting-periods', accountingPeriodRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

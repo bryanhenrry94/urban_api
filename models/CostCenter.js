@@ -4,8 +4,11 @@ const mongoose = require('mongoose');
 const CostCenterSchema = new mongoose.Schema({
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant", required: true },
     name: { type: String, required: true },
-    description: { type: String },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+}, {
+    timestamps: true,
+    collection: 'cost_centers'
 });
 
 const CostCenter = mongoose.model("CostCenter", CostCenterSchema);
